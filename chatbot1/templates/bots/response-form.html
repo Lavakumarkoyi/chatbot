@@ -1,0 +1,75 @@
+{% extends 'sadmin/main.html' %} {% block response %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-4">
+      <nav class="main-nav float-left king">
+        <button class="btn btn-danger btn-response">TextResponse</button>
+      </nav>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="jumbotron mt-5 bg-secondary">
+        <form class="form" method="POST">
+          {% csrf_token %}
+
+          <div class="col form-group">
+            <input
+              type="text"
+              class="form-control"
+              name="Response1"
+              placeholder="Response1"
+            />
+          </div>
+          <div class="form-data-div"></div>
+          <div class="col form-group">
+            <button class="btn btn-light">
+              <i class="fa fa-plus-circle" aria-hidden="true"></i>Add Responses
+            </button>
+          </div>
+          <div class="col form-group ki">
+            <button type="submit" class="btn btn-success btn-block">
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .btn-response {
+    margin-top: 5px;
+    margin-left: 37px;
+  }
+</style>
+
+<script>
+  var count = 2;
+  document.querySelector('.btn-light').addEventListener('click', e => {
+    e.preventDefault();
+    var form_div = `<div class="col form-group">
+                        <input type="text" class="form-control phrase" name="Response${count}" placeholder="Response${count}">
+                        <span><button class="btn"><i class="fa fa-trash" aria-hidden="true"></i></button><span>
+                    </div>`;
+    document.querySelector('.form-data-div').innerHTML += form_div;
+    count++;
+  });
+
+  document.querySelector('.form-data-div').addEventListener('click', e => {
+    e.preventDefault();
+    if (e.target.classList.contains('fa-trash')) {
+      if (
+        e.target.parentNode.parentNode.parentNode.children[0].classList.contains(
+          'phrase'
+        )
+      ) {
+        e.target.parentNode.parentNode.parentNode.remove();
+        count--;
+      }
+    }
+  });
+</script>
+
+{% endblock %}

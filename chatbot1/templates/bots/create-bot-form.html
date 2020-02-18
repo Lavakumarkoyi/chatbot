@@ -1,0 +1,93 @@
+{% extends 'sadmin/main.html' %} {% block create-bot-form %}
+<div class="root1">
+    <div class="main">
+        <div class="main2">
+            {% if message %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
+            <form method="POST" class="Myform">
+                {% csrf_token %}
+                <div>
+                    <div class="name first">
+                        <div>
+                            <label for="name">Bot Name</label>
+                        </div>
+                        <input type="text" placeholder="Bot Name" class="one" name="BotName">
+                    </div>
+
+                    <div class="name">
+                        <div>
+                            <label for="name">Bot typing Name</label>
+                        </div>
+                        <input type="text" placeholder="Bot typing name" class="one" name="BotTypingName">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="name first">
+                        <div>
+                            <label for="name">Welcome Message</label>
+                        </div>
+                        <input type="text" placeholder="Welcome Message" class="one" name="BotWelcomeMessage">
+                    </div>
+
+                    <div class="name">
+                        <div>
+                            <label for="name">Good Bye Message</label>
+                        </div>
+                        <input type="text" placeholder="Good Bye Message" class="one" name='BotGoodByeMessage'>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="name first">
+                        <div>
+                            <label for="name">Message for Failed Scenario</label>
+                        </div>
+                        <input type="text" class="one" placeholder="Message Failed scenario"
+                            name="BotMessageFailedScenario">
+                    </div>
+
+                    <div class="name">
+                        <div>
+                            <label>Message for connection error</label>
+                        </div>
+                        <input type="text" class="one" placeholder="Message for connection error"
+                            name="BotMessageConnectionError">
+                    </div>
+
+                    <div class="name">
+                        <div>
+                            <label>Bot description</label>
+                        </div>
+                        <textarea type="text" class="one" placeholder="Bot Description"
+                            name="BotDescription"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="name buttons">
+                    <button class="btn" type="submit">Save</button>
+                    <button class="btn" type="reset" class="reset">Reset</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<link href="/static/css/create-bot.css" rel="stylesheet" />
+
+
+
+<script>
+    document.querySelector('.reset').addEventListener('click', () => {
+        document.querySelector('.Myform').reset()
+    })
+</script>
+{% endblock %}

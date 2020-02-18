@@ -1,0 +1,44 @@
+{% extends 'sadmin/main.html' %} {% block Manageusers %}
+
+<div class="tabel-header">
+    <div class="container w-75 root-table">
+        <div clas="row">
+            <table class="table">
+                <thead class="thead">
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>number of bots</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                {% if users %}
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{user.username}}</td>
+                        <td>{{user.email}}</td>
+                        <td>5</td>
+                        <td><a href="/update/{{user.id}}"><button class="btn btn-sm btn-primary">Inactive</button></a></td>
+                        <td><a href="/delete/{{user.id}}"><button class="btn btn-sm btn-danger">Delete</button></a></td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-header {
+        position: relative;
+    }
+    
+    .root-table {
+        position: absolute;
+        left: 20%;
+    }
+</style>
+{% endblock %}

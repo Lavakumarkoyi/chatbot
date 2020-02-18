@@ -1,0 +1,41 @@
+{% extends 'sadmin/main.html' %}{% block subuserregistration %}
+<div class="container">
+    <div class="row">
+        <div class="jumbotron col-6 offset-3 bg-info">
+            {% if message %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
+            <form class="form" method="POST">
+                {% csrf_token %}
+                <div class="col form-group">
+                    <input type="text" class="form-control" name="username" placeholder="USERNAME" value="{{formData.username}}">
+                </div>
+                <div class="col form-group">
+                    <input type="email" class="form-control" name="email" placeholder="EMAIL" value="{{formData.email}}">
+                </div>
+                <div class="col form-group">
+                    <input type="password" class="form-control" name="password" placeholder="PASSWORD" value="{{formData.password}}">
+                </div>
+                <div class="col form-group">
+                    <input type="password" class="form-control" name="password1" placeholder="Confirm PASSWORD" value="{{formData.password1}}">
+                </div>
+                <div class="col form-group">
+                    <button type="submit" class="btn btn-danger">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    p a {
+        text-decoration: none;
+    }
+</style>
+
+{% endblock %}

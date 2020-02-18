@@ -1,0 +1,122 @@
+{% extends 'sadmin/main.html' %}{% block bot-group %}
+<div class="xyz">
+    <div class="container pqr">
+        <div class="row">
+            <div class="col-9 border-right border-dark">
+                <form class="form clearfix" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary float-right mb-3 mr-5 mt-2">saveGroup</button>
+                </form>
+                <div class="selected-intents">
+
+                </div>
+            </div>
+            <div class="col-3" style="height:500px;">
+                <div class="intent mt-3">
+                    <form class="form" method="POST">
+                        <div class="form-group">
+                            <input type="text" placeholder="search" class="form-control">
+                        </div>
+                    </form>
+
+                    <div class="total-intents">
+                        <ul class="list-group text-center side-intent">
+                            {% for group in public_groups %}
+                            <li class="list-group-item mb-2">
+                                <p class="d-inline">{{group.group_name}}</p>
+                                <p class="d-none">{{group.id}}</p>
+                                <span class="badge-pill float-right" style="cursor: pointer;">
+                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                </span>
+                            </li>
+                            {% endfor %}
+                            {% for group in private_groups %}
+                            <li class="list-group-item mb-2">
+                                <p class="d-inline">{{group.group_name}}</p>
+                                <p class="d-none">{{group.id}}</p>
+                                <span class="badge-pill float-right" style="cursor: pointer;">
+                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .xyz {
+        position: relative;
+    }
+
+    .pqr {
+        position: absolute;
+        left: 15%;
+    }
+</style>
+
+<script>
+    var count = 1
+    document.querySelector('.total-intents').addEventListener('click', (e) => {
+        //console.log('plus clicked')
+        if (e.target.classList.contains('fa-plus')) {
+            var group_id = e.target.parentNode.parentNode.children[1].textContent
+            var group_name = e.target.parentNode.parentNode.children[0].textContent
+            //console.log(intent_id, intent_name)
+
+            document.querySelector('.selected-intents').innerHTML += `<div class="list-group w-25 float-left mr-5 mb-3">
+                        <p class="list-group-item d-inline">${group_name}
+                        <span class="badge-pill float-right" style="cursor:pointer;">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                        </span></p>
+                        <p class="d-none">${group_id}</p>
+                    </div>`
+
+            document.querySelector('.form').innerHTML += `<input type="hidden" value='${group_id}' name='group${count}'>`
+
+            count++;
+
+            if (e.target.parentNode.parentNode.classList.contains('list-group-item')) {
+                e.target.parentNode.parentNode.remove()
+            }
+        }
+    })
+
+    document.querySelector('.selected-intents').addEventListener('click', (e) => {
+        if (e.target.classList.contains('fa-times')) {
+            if (e.target.parentNode.parentNode.parentNode.classList.contains('list-group')) {
+                var group_id = e.target.parentNode.parentNode.parentNode.children[1].textContent
+                var group_name = e.target.parentNode.parentNode.textContent
+
+                document.querySelector('.side-intent').innerHTML += `<li class="list-group-item mb-2">
+                                <p class="d-inline">${group_name}</p>
+                                <p class="d-none">${group_id}</p>
+                                <span class="badge-pill float-right" style="cursor: pointer;">
+                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                </span>
+                            </li>`
+
+                e.target.parentNode.parentNode.parentNode.remove()
+
+                var added_groups = document.querySelector('.form').children
+
+                for (var i = 0; i < added_groups.length; i++) {
+                    if (added_groups[i].value == group_id) {
+                        console.log(added_groups[i].value)
+                        document.querySelector('.form').children[i].remove()
+                        count--;
+                    }
+                }
+
+                console.log(added_groups)
+
+            }
+        }
+    })
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'sadmin/main.html' %}{% block create-group-form %}
+<div class="xyz">
+    <div class="container pqr">
+        <div class="row">
+            <div class="jumbotron col-10 offset-3 mt-5 bg-secondary">
+                {% if message %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{message}}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endif %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="col form-group">
+                        <input type="text" class="form-control" name="GroupName" placeholder="GroupName" />
+                    </div>
+                    <div class="col form-group">
+                        <input type="text" class="form-control" name="GroupDescription"
+                            placeholder="GroupDescription" />
+                    </div>
+                    <div class="col-3 form-group">
+                        <select class="form-control" name="privacy">
+                            <option value="public">public</option>
+                            <option value="private">private</option>
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <button type="submit" class="btn btn-success btn-block">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .xyz {
+        position: relative;
+    }
+
+    .pqr {
+        position: absolute;
+        left: 15%;
+        position: relative;
+    }
+
+    .jumbotron {
+        position: absolute;
+        left: -25%;
+    }
+</style>
+
+{% endblock %}

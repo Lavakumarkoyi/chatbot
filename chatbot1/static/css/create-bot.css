@@ -1,0 +1,58 @@
+.root1 {
+    position: relative;
+}
+
+.main {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-35%);
+}
+
+.name {
+    margin-bottom: 20px;
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.first {
+    margin-right: 20px;
+}
+
+.main2 {
+    margin-left: 20px;
+    margin-right: 20px;
+    position: relative;
+}
+
+.buttons {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.one {
+    padding: 8px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    border: 1px solid black;
+    width: 250px;
+}
+
+button {
+    padding: 10px;
+    outline: none;
+    background: none;
+    cursor: pointer;
+    border: 1px solid grey;
+    border-radius: 5px;
+}
+
+button[type="submit"] {
+    background-color: lightseagreen;
+}
+
+button[type="reset"] {
+    background-color: lightgreen;
+}
