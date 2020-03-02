@@ -16,14 +16,34 @@
                 {% if users %}
                 <tbody>
                     {% for user in users %}
+                    {% if user.is_staff is False %}
                     <tr>
                         <td>{{user.username}}</td>
                         <td>{{user.email}}</td>
-                        <td>5</td>
-                        <td><a href="/update/{{user.id}}"><button class="btn btn-sm btn-primary">Inactive</button></a></td>
-                        <td><a href="/delete/{{user.id}}"><button class="btn btn-sm btn-danger">Delete</button></a></td>
-                        {% endfor %}
+                        <td>{{user.id}}</td>
+                        <td>
+                            <form style="display: inline;" method="POST" action="/user-id/inactive-user">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{user.id}}" name="user_id" />
+                                {% if user.is_active %}
+                                <input type="hidden" value="active" name="activity" />
+                                <button class="btn btn-sm btn-primary" type="submit">Inactive</button>
+                                {% else %}
+                                <input type="hidden" value="inactive" name="activity" />
+                                <button class="btn btn-sm btn-primary" type="submit">active</button>
+                                {% endif %}
+                            </form>
+                        </td>
+                        <td>
+                            <form style="display: inline;" method="POST" action="/user-id/delete-user">
+                                {% csrf_token %}
+                                <input type="hidden" value="{{user.id}}" name="user_id" />
+                                <button class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
                     </tr>
+                    {% endif %}
+                    {% endfor %}
                 </tbody>
                 {% endif %}
             </table>
@@ -35,10 +55,14 @@
     .table-header {
         position: relative;
     }
-    
+
     .root-table {
         position: absolute;
         left: 20%;
     }
 </style>
+
+<script>
+
+</script>
 {% endblock %}

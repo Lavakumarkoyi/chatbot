@@ -10,6 +10,7 @@ from asgiref.sync import async_to_sync
 from sadmin.models import *
 from django.contrib.auth.models import User
 import random
+from channels.exceptions import StopConsumer
 
 import pymongo
 from bson.objectid import ObjectId
@@ -91,10 +92,19 @@ class ChatConsumer(AsyncConsumer):
                 self.questions.append(
                     random.choice(intent2['intent_response']))
 
-        if len(self.questions) > 0:
-            await self.send({
-                'type': 'websocket.accept'
-            })
+        await self.send({
+            'type': 'websocket.accept',
+        })
+
+        msg = {
+            'msg': self.welcome,
+            'type': "welcome"
+        }
+
+        await self.send({
+            'type': 'websocket.send',
+            'text': json.dumps(msg)
+        })
 
     async def websocket_receive(self, event):
 
@@ -103,72 +113,44 @@ class ChatConsumer(AsyncConsumer):
 
         if user.is_authenticated:
             username = user.username
+
         if event.get('text') == 'opened':
-            serverdata = {
-                'msgtype': 'intro',
-                'msg': self.questions[self.i],
-                'welcome': self.welcome,
-                'user': 'server'
-            }
-
-            self.i = self.i + 1
-
-            await self.send({
-                'type': 'websocket.send',
-                'text': json.dumps(serverdata)
-            })
-        else:
-            userdata = {
-                'msg': event.get('text'),
-                'user': 'client'
-            }
-
-            messages = {
-                'question': self.questions[self.j],
-                'answer': event.get('text')
-            }
-
-            self.MessageData.append(messages)
-
-            self.j = self.j + 1
-
-            if self.i == len(self.questions):
-                serverdata = {
-                    'msg': self.goodbye,
-                    'user': 'server'
-                }
-
-                closesocket = {
-                    'msg': 'close'
-                }
-
-                await self.send({
-                    'type': 'websocket.send',
-                    'text': json.dumps([userdata, serverdata, closesocket])
-                })
-                print('Hi')
-
-                print(self.MessageData)
-
-                async_to_sync(db.chatdata.insert_one(
-                    {"user": username, "date": datetime.now(), "chats": [self.MessageData]}))
-
-                self.scope["session"].save()
-            else:
-                closesocket = {
-                    'msg': 'open'
-                }
-                serverdata = {
+            if len(self.questions) > 0:
+                msg = {
                     'msg': self.questions[self.i],
-                    'user': 'server'
+                    'type': 'normal'
                 }
-
                 await self.send({
                     'type': 'websocket.send',
-                    'text': json.dumps([userdata, serverdata, closesocket])
+                    'text': json.dumps(msg)
+                })
+
+                self.i = self.i + 1
+        else:
+            if self.i < len(self.questions):
+                msg = {
+                    'msg': self.questions[self.i],
+                    'type': 'normal'
+                }
+                await self.send({
+                    'type': 'websocket.send',
+                    'text': json.dumps(msg)
                 })
 
                 self.i = self.i + 1
 
+            else:
+                msg = {
+                    'msg': self.goodbye,
+                    'type': 'goodbye'
+                }
+                await self.send({
+                    'type': 'websocket.send',
+                    'text': json.dumps(msg)
+                })
+
+                self.scope["session"].save()
+
     async def websocket_disconnect(self, event):
         print(event)
+        raise StopConsumer()

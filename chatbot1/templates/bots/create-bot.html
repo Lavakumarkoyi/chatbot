@@ -3,17 +3,59 @@
 <div class="clearfix">
     <div class="sub-main" style="width:80%;float:right;margin-right:10px;">
         <div class="button-div float-right">
-            <a href="/sadmin/createbot/"><button class="btn btn-outline-info">CreateBot</button></a>
+            <a href="/bot-console/bot-form/"><button class="btn btn-outline-info">CreateBot</button></a>
         </div>
 
 
-        <div class="container" style="margin-top:70px;">
+        <div class="container bot-container" style="margin-top:70px;">
             <div class="row">
                 {% if bots %} {% for bot in bots %}
                 <div class="group float-left mr-3 mb-4 clearfix" style="width: 250px;margin-left:10px;">
                     <div class="intent-button clearfix">
-                        <a href="/chat/{{bot.created_by}}/{{bot.id}}"><button class="btn d-inline float-right"><i
-                                    class="fa fa-eye" aria-hidden="true"></i></button></a>
+                        <button class="float-right ki btn" onclick="bots('{{username}}','{{bot.id}}')"
+                            data-toggle="modal" data-target="#m{{bot.id}}"><i class="fa fa-eye"
+                                aria-hidden="true"></i></button>
+
+                        <div id="m{{bot.id}}" class="modal fade">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- Content will be loaded here from "groups" file -->
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">{{bot.bot_name}} Chatbot</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body chatbot">
+                                        <div class="row offset-1">
+                                            <div class="col-12">
+                                                <ul id="chatdata{{bot.id}}"></ul>
+                                            </div>
+                                        </div>
+                                        <div class="row offset-1">
+                                            <div class="col">
+                                                <form class="form formD{{bot.id}}">
+                                                    {% csrf_token %}
+                                                    <div class="col-5 form-group">
+                                                        <input type="text" class="form-control msg{{bot.id}}"
+                                                            placeholder="send Message" />
+                                                    </div>
+                                                    <div class="col form-group">
+                                                        <button class="btn btn-primary me{{bot.id}}">send</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary close"
+                                            data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                         <button class="btn d-inline float-right">
                             <i class="fa fa-edit" aria-hidden="true"></i>
                         </button>
@@ -57,7 +99,7 @@
 
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
+                                        <button type="button" class="btn btn-secondary close"
                                             data-dismiss="modal">Close</button>
                                     </div>
                                 </div>
@@ -85,6 +127,103 @@
     $(window).on('load', function () { console.log('Hi jquery is loaded') });
     $('.intent-div').sortable();
 </script>
+
+<script>
+
+    function bots(username, bot_id) {
+        document.querySelector('.me' + bot_id).disabled = false;
+        document.querySelector('.msg' + bot_id).disabled = false;
+
+        var endpoint = '';
+        var wsstart = 'ws://';
+        if (window.location.protocol == 'https:') {
+            wsstart = 'wss://';
+        }
+        endpoint = wsstart + window.location.hostname + ':' + window.location.port + '/chat/' + username + '/' + bot_id;
+        console.log(endpoint);
+
+        var socket = new WebSocket(endpoint);
+
+        var count = 0;
+
+        /*document.querySelector('.close').addEventListener('click', () => {
+            var childIntents = document.querySelector('#chatdata' + bot_id).children.length
+            for (let i = 0; i < childIntents; i++) {
+                document.querySelector('#chatdata' + bot_id).children[0].remove()
+            }
+
+            //socket.close()
+
+            //window.location.reload()
+
+        })*/
+
+        document.querySelector('.formD' + bot_id).addEventListener('submit', e => {
+            e.preventDefault();
+            msg = document.querySelector('.msg' + bot_id).value;
+            socket.send(msg);
+            //$('#chatdata' + bot_id).html('');
+            //$('#chatdata' + bot_id + ' li').remove();
+            $('#chatdata' + bot_id).append(
+                `<li>${msg}</li>`)
+            document.querySelector('.msg' + bot_id).value = '';
+        });
+
+
+
+
+
+        socket.onmessage = function (e) {
+            var chatdata = JSON.parse(e.data);
+
+            if (chatdata.type == "goodbye") {
+                $('#chatdata' + bot_id).append(
+                    `<li>${chatdata.msg}</li>`)
+
+                document.querySelector('.me' + bot_id).disabled = true;
+                document.querySelector('.msg' + bot_id).disabled = true;
+
+                if (socket.readyState === socket.OPEN) {
+                    socket.close()
+                }
+
+
+            }
+            else {
+                $('#chatdata' + bot_id).append(
+                    `<li>${chatdata.msg}</li>`)
+
+            }
+
+
+        };
+
+        socket.onopen = function (e) {
+            console.log('socket opened', e)
+            socket.send('opened');
+            $('#chatdata' + bot_id + ' li').remove();
+
+            //console.log('onopen', e)
+
+        };
+
+        socket.onerror = function (e) {
+            //console.log('onerror', e)
+        };
+
+        socket.onclose = function (e) {
+
+            console.log('csscc');
+            console.log('onclose', e)
+
+
+        };
+    }
+
+</script>
+
+
+
 
 
 {% endblock %}

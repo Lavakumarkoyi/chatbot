@@ -4,6 +4,7 @@ from sadmin.views import navbar
 from datetime import datetime
 from django.http import HttpResponseRedirect
 from sadmin.models import *
+from sadmin.models import *
 
 import pymongo
 from bson.objectid import ObjectId
@@ -169,14 +170,14 @@ class group_intent(View):
 
             print('updated successfully in public groups')
 
-            return redirect('/groups/create-group')
+            return redirect('/bot-console/groups/')
         else:
             db[private_collection].update_one(
                 {'_id': ObjectId(group_id)}, {"$set": {"intents": intents, "intent_ids": intent_ids}})
 
             print('updated successfully in private groups')
 
-            return redirect('/groups/create-group')
+            return redirect('/bot-console/groups/')
 
 
 class intent_flow(View):
@@ -282,11 +283,11 @@ class delete_group(View):
 
             print("Removed successfully from public groups")
 
-            return HttpResponseRedirect('/groups/create-group')
+            return HttpResponseRedirect('/bot-console/groups/')
 
         else:
             db[private_groups_collection].remove({'_id': ObjectId(group_id)})
 
             print("Removed successfully from private groups")
 
-            return HttpResponseRedirect('/groups/create-group')
+            return HttpResponseRedirect('/bot-console/groups/')

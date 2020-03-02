@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from sadmin.models import *
 from datetime import datetime
 from rest_framework.views import APIView
+from sadmin.models import *
 
 import pymongo
 from bson.objectid import ObjectId
@@ -144,14 +145,14 @@ class IntentResponseView(View):
 
             print('updated successfully in public intents')
 
-            return redirect('/intents/create-intent')
+            return redirect('/bot-console/intents/')
         else:
             db[private_collection].update_one(
                 {'_id': ObjectId(intent_id)}, {"$set": {"intent_response": responses}})
 
             print('updated successfully in private intents')
 
-            return redirect('/intents/create-intent')
+            return redirect('/bot-console/intents/')
 
 
 class delete_intent(View):
@@ -195,11 +196,11 @@ class delete_intent(View):
         if one is not None:
             db[public_collection].remove({'_id': ObjectId(intent_id)})
 
-            return redirect('/intents/create-intent/')
+            return redirect('/bot-console/intents/')
 
         if two is not None:
             db[private_collection].remove({'_id': ObjectId(intent_id)})
 
-            return redirect('/intents/create-intent/')
+            return redirect('/bot-console/intents/')
 
         return HttpResponse('No intent found')

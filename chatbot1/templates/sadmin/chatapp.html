@@ -1,144 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
 
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
 
-    <link
-      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-      rel="stylesheet"
-    />
-  </head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
 
-  <body>
-    <div class="container mt-5">
-      <div class="row">
-        <div class="col">
-          <h1 class="text-center">Django channels chatbot</h1>
-          <hr />
-        </div>
-        <a
-          href="/logout"
-          style="line-height: -1.7; text-decoration: none;float:left;margin-right:5px;"
-          ><span><button class="btn btn-success">Logout</button></span></a
-        >
-        <a
-          href="/sadmin"
-          style="line-height: -1.7; text-decoration: none;float:left;"
-          ><span><button class="btn btn-success">Back</button></span></a
-        >
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col">
+        <h1 class="text-center">Django channels chatbot</h1>
+        <hr />
       </div>
-      <div class="row offset-1">
-        <div class="col-6">
-          <ul id="chat-items"></ul>
-        </div>
-      </div>
-      <div class="row offset-1">
-        <div class="col">
-          <form class="form formData" method="POST">
-            {% csrf_token %}
-            <div class="col-5 form-group">
-              <input
-                type="text"
-                class="form-control msg"
-                placeholder="send Message"
-              />
-            </div>
-            <div class="col form-group">
-              <button class="btn btn-primary me">send</button>
-            </div>
-          </form>
-        </div>
+      <a href="/logout" style="line-height: -1.7; text-decoration: none;float:left;margin-right:5px;"><span><button
+            class="btn btn-success">Logout</button></span></a>
+      <a href="/bot-console/bots" style="line-height: -1.7; text-decoration: none;float:left;"><span><button
+            class="btn btn-success">Back</button></span></a>
+    </div>
+    <div class="row offset-1">
+      <div class="col-6">
+        <ul id="chat-items"></ul>
       </div>
     </div>
+    <div class="row offset-1">
+      <div class="col">
+        <form class="form formData" method="POST">
+          {% csrf_token %}
+          <div class="col-5 form-group">
+            <input type="text" class="form-control msg" placeholder="send Message" />
+          </div>
+          <div class="col form-group">
+            <button class="btn btn-primary me">send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
-    <script>
-      var endpoint = '';
-      var wsstart = 'ws://';
-      if (window.location.protocol == 'https:') {
-        wsstart = 'wss://';
+  <script>
+    var endpoint = '';
+    var wsstart = 'ws://';
+    if (window.location.protocol == 'https:') {
+      wsstart = 'wss://';
+    }
+    endpoint = wsstart + window.location.hostname + ':' + window.location.port + '/chat/{{username}}/{{bot_id}}';
+    console.log(endpoint);
+
+    var socket = new WebSocket(endpoint);
+
+    var count = 0;
+
+    socket.onmessage = function (e) {
+      //console.log("onmessage", e)
+      var chatdata = JSON.parse(e.data);
+      console.log(chatdata);
+      if (chatdata.msgtype == 'intro') {
+        $('#chat-items').append(
+          `<li>${chatdata.welcome} via <span class="h5 text-danger">${chatdata.user}</span></li>`
+        );
+        $('#chat-items').append(
+          `<li>${chatdata.msg} via <span class="h5 text-danger">${chatdata.user}</span></li>`
+        );
+      } else {
+        $('#chat-items').append(
+          `<li>${chatdata[0].msg} via <span class="h5 text-success">${chatdata[0].user}</span></li>`
+        );
+        setTimeout(() => {
+          $('#chat-items').append(
+            `<li>${chatdata[1].msg} via <span class="h5 text-danger">${chatdata[1].user}</spa></li>`
+          );
+        }, 1000);
+
+        if (chatdata[2].msg == 'close') {
+          document.querySelector('.me').disabled = true;
+          document.querySelector('.msg').disabled = true;
+        }
       }
-      endpoint = wsstart + window.location.host + window.location.pathname;
-      console.log(endpoint);
+    };
 
-      var socket = new WebSocket(endpoint);
+    socket.onopen = function (e) {
+      if (count == 0) {
+        socket.send('opened');
+        count++;
+      }
+      //console.log('onopen', e)
+      document.querySelector('.formData').addEventListener('submit', e => {
+        e.preventDefault();
+        msg = document.querySelector('.msg').value;
+        socket.send(msg);
+        document.querySelector('.msg').value = '';
+      });
+    };
 
-      var count = 0;
+    socket.onerror = function (e) {
+      //console.log('onerror', e)
+    };
 
-      socket.onmessage = function(e) {
-        //console.log("onmessage", e)
-        var chatdata = JSON.parse(e.data);
-        console.log(chatdata);
-        if (chatdata.msgtype == 'intro') {
-          $('#chat-items').append(
-            `<li>${chatdata.welcome} via <span class="h5 text-danger">${chatdata.user}</span></li>`
-          );
-          $('#chat-items').append(
-            `<li>${chatdata.msg} via <span class="h5 text-danger">${chatdata.user}</span></li>`
-          );
-        } else {
-          $('#chat-items').append(
-            `<li>${chatdata[0].msg} via <span class="h5 text-success">${chatdata[0].user}</span></li>`
-          );
-          setTimeout(() => {
-            $('#chat-items').append(
-              `<li>${chatdata[1].msg} via <span class="h5 text-danger">${chatdata[1].user}</spa></li>`
-            );
-          }, 1000);
+    socket.onclose = function (e) {
+      //console.log('onclose', e)
+    };
+  </script>
 
-          if (chatdata[2].msg == 'close') {
-            document.querySelector('.me').disabled = true;
-            document.querySelector('.msg').disabled = true;
-          }
-        }
-      };
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+</body>
 
-      socket.onopen = function(e) {
-        if (count == 0) {
-          socket.send('opened');
-          count++;
-        }
-        //console.log('onopen', e)
-        document.querySelector('.formData').addEventListener('submit', e => {
-          e.preventDefault();
-          msg = document.querySelector('.msg').value;
-          socket.send(msg);
-          document.querySelector('.msg').value = '';
-        });
-      };
-
-      socket.onerror = function(e) {
-        //console.log('onerror', e)
-      };
-
-      socket.onclose = function(e) {
-        //console.log('onclose', e)
-      };
-    </script>
-
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-      crossorigin="anonymous"
-    ></script>
-  </body>
 </html>

@@ -22,6 +22,7 @@ class client(models.Model):
     client_name = models.CharField(max_length=50, unique=True)
     client_logo = models.URLField(max_length=255, null=True, blank=True)
     client_added = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
 
 class client_user(models.Model):

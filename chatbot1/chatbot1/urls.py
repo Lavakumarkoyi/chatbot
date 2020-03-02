@@ -19,8 +19,9 @@ from django.conf.urls import include
 from sadmin.views import *
 from app.views import *
 from django.views.generic import TemplateView
-from intents.views import *
-from groups.views import *
+from Management.bots import *
+from Management.intents import *
+from Management.groups import *
 
 
 urlpatterns = [
@@ -31,9 +32,10 @@ urlpatterns = [
     path('accounts/login/', login.as_view(), name="login"),
     path('intents/response-form/<str:intent_id>',
          IntentResponseView.as_view(), name="response_form"),
-    path('sadmin/', include('sadmin.urls')),
-    path('intents/', include('intents.urls')),
-    path('groups/', include('groups.urls')),
+    # path('sadmin/', include('sadmin.urls')),
+    # path('intents/', include('intents.urls')),
+    # path('groups/', include('groups.urls')),
+    path('bot-console/', include('Management.urls')),
     path('admin/', admin.site.urls),
     path('logout/', logout.as_view()),
     path('chat/<username>/<str:bot_id>', ChatView),
@@ -46,5 +48,7 @@ urlpatterns = [
     path('intent-flow/<str:group_id>', intent_flow.as_view()),
     path('group-flow/<str:bot_id>', group_flow.as_view()),
     path('bot-group/<str:bot_id>', bot_group.as_view()),
+    path('user-id/inactive-user', Inactive_user.as_view()),
+    path('user-id/delete-user', delete_user.as_view()),
     #path('complete/', realChat.as_view()),
 ]

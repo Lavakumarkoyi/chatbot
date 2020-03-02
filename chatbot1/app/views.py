@@ -16,4 +16,4 @@ from django.views.generic import View
 @login_required
 def ChatView(request, username, bot_id):
     if request.user.username == username:
-        return render(request, 'sadmin/chatapp.html')
+        return render(request, 'sadmin/chatapp.html', {'username': username, 'bot_id': bot_id})

@@ -4,17 +4,9 @@
     <div class="row">
       <div class="jumbotron col-10 offset-3 mt-5 bg-secondary">
         {% if message %}
-        <div
-          class="alert alert-warning alert-dismissible fade show"
-          role="alert"
-        >
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
           {{message}}
-          <button
-            type="button"
-            class="close"
-            data-dismiss="alert"
-            aria-label="Close"
-          >
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -22,26 +14,17 @@
         <form method="POST">
           {% csrf_token %}
           <div class="col form-group">
-            <input
-              type="text"
-              class="form-control"
-              name="IntentName"
-              placeholder="IntentName"
-            />
+            <input type="text" class="form-control" name="IntentName" placeholder="IntentName" />
           </div>
           <div class="col form-group">
-            <input
-              type="text"
-              class="form-control"
-              name="IntentDescription"
-              placeholder="IntentDescription"
-            />
+            <input type="text" class="form-control" name="IntentDescription" placeholder="IntentDescription" />
           </div>
           <div class="col-3 form-group">
-            <select class="form-control" name="privacy">
+            <input type="hidden" value="private" name="privacy" />
+            <!--<select class="form-control" name="privacy">
               <option value="public">public</option>
               <option value="private">private</option>
-            </select>
+            </select>-->
           </div>
           <div class="form-data-div"></div>
           <div class="col form-group">
